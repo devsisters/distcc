@@ -223,9 +223,9 @@ int dcc_scan_args(char *argv[], char **input_file, char **output_file,
                        && argv[i+1]
                        && !str_startswith("c", argv[i+1])
                        && !str_startswith("c++", argv[i+1])
-                       && !str_startswith("objective-c", argv[i+1])
-                       && !str_startswith("objective-c++", argv[i+1])
-                       && !str_startswith("go", argv[i+1])
+                    //    && !str_startswith("objective-c", argv[i+1])
+                    //    && !str_startswith("objective-c++", argv[i+1])
+                    //    && !str_startswith("go", argv[i+1])
                        ) {
                 rs_log_info("gcc's -x handling is complex; running locally for %s", argv[i+1] ? argv[i+1] : "empty");
                 return EXIT_DISTCC_FAILED;
