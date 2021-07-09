@@ -54,6 +54,7 @@
 int dcc_cpp_maybe(char **argv, char *input_fname, char **cpp_fname,
           pid_t *cpp_pid)
 {
+    char **temp_cpp_argv;
     char **cpp_argv;
     int ret;
     char *input_exten;
@@ -90,9 +91,20 @@ int dcc_cpp_maybe(char **argv, char *input_fname, char **cpp_fname,
      * and objects in different directories, and who don't specify -MF.  They
      * can fix it by specifying -MF.  */
 
-    if ((ret = dcc_strip_dasho(argv, &cpp_argv))
-        || (ret = dcc_set_action_opt(cpp_argv, "-E")))
+    if ((ret = dcc_strip_dasho(argv, &temp_cpp_argv))
+        || (ret = dcc_set_action_opt(temp_cpp_argv, "-E")))
         return ret;
+    cpp_argv = temp_cpp_argv;
+
+    /* add -frewrite-includes, -frewrite-imports. 
+     * it helps to handle the issues missing include files are making. */
+    if (strcmp(cpp_argv[0], "clang") == 0 || strncmp(cpp_argv[0], "clang-", strlen("clang-")) == 0 ||
+        strcmp(cpp_argv[0], "clang++") == 0 || strncmp(cpp_argv[0], "clang++-", strlen("clang++-")) == 0) {
+        if ((ret = dcc_strip_clang_module(cpp_argv, &temp_cpp_argv)))
+            return ret;
+        cpp_argv = temp_cpp_argv;
+        dcc_argv_append(argv, strdup("-frewrite-includes"));
+    }
 
     /* FIXME: cpp_argv is leaked */
 

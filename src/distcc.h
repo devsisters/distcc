@@ -289,6 +289,7 @@ int dcc_add_cleanup(const char *filename) WARN_UNUSED;
 
 /* strip.c */
 int dcc_strip_local_args(char **from, char ***out_argv);
+int dcc_strip_clang_module(char **from, char ***out_argv);
 int dcc_strip_dasho(char **from, char ***out_argv);
 
 /* cpp.c */

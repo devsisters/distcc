@@ -147,6 +147,44 @@ int dcc_strip_local_args(char **from, char ***out_argv)
     return 0;
 }
 
+int dcc_strip_clang_module(char **from, char ***out_argv)
+{
+    char **to;
+    int from_i, to_i;
+    int from_len;
+
+    from_len = dcc_argv_len(from);
+    *out_argv = to = malloc((from_len + 1) * sizeof (char *));
+
+    if (!to) {
+        rs_log_error("failed to allocate space for arguments");
+        return EXIT_OUT_OF_MEMORY;
+    }
+
+    /* skip through argv, copying all arguments but skipping ones that
+     * ought to be omitted */
+    for (from_i = to_i = 0; from[from_i]; from_i++) {
+        if (str_equal("-fmodules", from[from_i])
+            || str_equal("-fmodules-validate-once-per-build-session", from[from_i])
+            || str_equal("-fcxx-modules", from[from_i])
+            || str_equal("-fmodules-ts", from[from_i])) {
+            /* skip next word, being option argument */
+            if (from[from_i+1])
+                from_i++;
+        }
+        else {
+            to[to_i++] = from[from_i];
+        }
+    }
+
+    /* NULL-terminate */
+    to[to_i] = NULL;
+
+    dcc_trace_argv("result", to);
+
+    return 0;
+}
+
 
 
 /**
